@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF Tournament Pro</title>
+    <style>
+        :root { --primary: #e94560; --bg: #1a1a2e; --card: #16213e; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; }
+        .card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { color: var(--primary); letter-spacing: 2px; text-transform: uppercase; }
+        input { width: 90%; padding: 15px; margin: 10px 0; border-radius: 12px; border: none; background: #0f3460; color: white; font-size: 16px; }
+        button { background: var(--primary); color: white; padding: 15px; border: none; border-radius: 12px; font-weight: bold; width: 100%; font-size: 16px; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4); }
+        button:hover { transform: translateY(-3px); opacity: 0.9; }
+        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .status-badge { background: #27ae60; padding: 5px 15px; border-radius: 50px; font-size: 12px; margin-bottom: 10px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <div id="auth-screen">
+        <h2 style="color: #f1c40f;">🏆 PRO LOGIN</h2>
+        <div class="card" style="width: 85%;">
+            <input type="email" id="auth-email" placeholder="Email Address">
+            <input type="password" id="auth-password" placeholder="Password (6+ digits)">
+            <button id="btnLogin" style="background: #27ae60;">LOGIN NOW</button>
+            <p style="margin: 15px 0; font-size: 12px; color: #aaa;">Don't have an account?</p>
+            <button id="btnSignup" style="background: #3498db;">CREATE ACCOUNT</button>
+        </div>
+    </div>
+
+    <div id="main-content" style="display:none;">
+        <div class="card">
+            <span class="status-badge">ONLINE MATCH</span>
+            <h2 style="margin: 5px 0;">BERMUDA MASTERS</h2>
+            <p style="color: #aaa;">Prize Pool: <b id="win-prize" style="color: #f1c40f;">₹0</b></p>
+            <p>Entry Fee: <b id="entry-fee">FREE</b> | Time: <b id="m-time">TBD</b></p>
+        </div>
+
+        <div class="card" style="border: 1px solid #25d366;">
+            <h4 style="margin: 0; color: #25d366;">COMMUNITY SUPPORT</h4>
+            <a href="https://chat.whatsapp.com/CanP81lzBVo6gQkpe0suHx?mode=gi_t" target="_blank" style="text-decoration:none;">
+                <button style="background: #25d366; margin-top:10px;">JOIN WHATSAPP GROUP</button>
+            </a>
+        </div>
+
+        <div class="card">
+            <h3>🔥 JOIN TOURNAMENT</h3>
+            <input type="text" id="pName" placeholder="FF Name">
+            <input type="number" id="pUid" placeholder="FF UID">
+            <button id="btnRegister">CONFIRM REGISTRATION</button>
+        </div>
+
+        <div id="player-list"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLqZsHMpuS6dTXz2nLNdCaHpAvWS2zDNE",
+            authDomain: "ff-tonament-hub.firebaseapp.com",
+            databaseURL: "https://ff-tonament-hub-default-rtdb.firebaseio.com",
+            projectId: "ff-tonament-hub",
+            storageBucket: "ff-tonament-hub.firebasestorage.app",
+            messagingSenderId: "651520007117",
+            appId: "1:651520007117:web:181fd0e300d4b63865c284"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const baseURL = "https://ff-tonament-hub-default-rtdb.firebaseio.com/";
+
+        // Auth Logic
+        document.getElementById('btnSignup').onclick = () => {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-password').value;
+            createUserWithEmailAndPassword(auth, email, pass).then(() => alert("Account Created!")).catch(e => alert(e.message));
+        };
+
+        document.getElementById('btnLogin').onclick = () => {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-password').value;
+            signInWithEmailAndPassword(auth, email, pass).catch(e => alert("Login Failed!"));
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                loadData();
+            }
+        });
+
+        function loadData() {
+            fetch(baseURL + "match_info.json").then(res => res.json()).then(info => {
+                if(info) {
+                    document.getElementById('win-prize').innerText = "₹" + info.winner_prize;
+                    document.getElementById('m-time').innerText = info.time || "TBD";
+                    document.getElementById('entry-fee').innerText = (info.fee == 0) ? "FREE" : "₹" + info.fee;
+                }
+            });
+            // Player list fetch logic same as before...
+        }
+    </script>
+</body>
+</html>
