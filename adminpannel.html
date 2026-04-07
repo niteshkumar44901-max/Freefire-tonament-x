@@ -2,38 +2,47 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Admin Panel - Control</title>
     <style>
         body { background: #0a0a12; color: white; font-family: sans-serif; padding: 20px; text-align: center; }
         .box { background: #16213e; padding: 15px; border-radius: 12px; border: 1px solid #00f2ff; margin-bottom: 15px; }
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; background: #05050a; color: white; box-sizing: border-box; font-size: 16px; }
         button { width: 100%; padding: 12px; background: #00f2ff; color: black; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+        h2 { color: #00f2ff; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-    <h2>🎮 ADMIN PANEL</h2>
+    <h2>🎮 ADMIN CONTROL</h2>
     
     <div class="box">
-        <input type="text" id="w" placeholder="Prize (e.g. ₹200)">
+        <p style="margin:0; color:#aaa; font-size:12px;">Prize Settings</p>
+        <input type="text" id="w" placeholder="Booyah Prize (e.g. ₹100)">
+        <input type="text" id="pk" placeholder="Per Kill Prize (e.g. ₹5)">
+        
+        <p style="margin:10px 0 0 0; color:#aaa; font-size:12px;">Room Details</p>
         <input type="text" id="i" placeholder="Room ID">
         <input type="text" id="p" placeholder="Room Password">
-        <textarea id="r" rows="3" placeholder="Tournament Rules..."></textarea>
+        
+        <p style="margin:10px 0 0 0; color:#aaa; font-size:12px;">Tournament Rules</p>
+        <textarea id="r" rows="3" placeholder="1. No Hack..."></textarea>
+        
         <button onclick="save()">SAB UPDATE KARO</button>
     </div>
 
     <script>
         function save() {
             const db = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/";
-            const win = document.getElementById('w').value;
-            const id = document.getElementById('i').value;
-            const pass = document.getElementById('p').value;
-            const rules = document.getElementById('r').value;
+            const data = {
+                win: document.getElementById('w').value,
+                perkill: document.getElementById('pk').value,
+                id: document.getElementById('i').value,
+                pass: document.getElementById('p').value,
+                rules: document.getElementById('r').value
+            };
 
-            fetch(db + "matches/bermuda/win.json", { method: 'PUT', body: JSON.stringify(win) });
-            fetch(db + "room_details/id.json", { method: 'PUT', body: JSON.stringify(id) });
-            fetch(db + "room_details/pass.json", { method: 'PUT', body: JSON.stringify(pass) });
-            fetch(db + "settings/rules.json", { method: 'PUT', body: JSON.stringify(rules) })
+            // Sab ek saath database mein save hoga
+            fetch(db + "match_settings.json", { method: 'PUT', body: JSON.stringify(data) })
             .then(() => alert("✅ Sab kuch update ho gaya!"));
         }
     </script>
