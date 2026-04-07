@@ -1,7 +1,12 @@
-head>
+<!DOCTYPE html>
+<html lang="hi">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FF Pro Tournament</title>
+    <title>FF Tournament Pro</title>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
+    
     <style>
         :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; --gold: #f1c40f; }
         body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 0; }
@@ -9,55 +14,75 @@ head>
         .coin-box { background: rgba(0,242,255,0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--neon); color: var(--neon); font-weight: bold; }
         .container { padding: 15px; padding-bottom: 80px; }
         .card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
-        .tag { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-bottom: 8px; display: inline-block; text-transform: uppercase; }
-        .tag-paid { background: var(--gold); color: #000; }
-        .tag-free { background: #2ecc71; color: #fff; }
-        button.join-btn { background: var(--neon); color: #000; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #16213e; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; }
+        button.join-btn { background: var(--neon); color: #000; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; margin-top: 10px; cursor: pointer; width: 100%; }
+        #toast { visibility: hidden; min-width: 250px; background-color: #27ae60; color: #fff; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 80px; transform: translateX(-50%); font-weight: bold; }
+        #toast.show { visibility: visible; }
     </style>
 </head>
 <body>
     <div class="header">
-        <span style="font-weight: bold;">FF TOURNAMENT PRO</span>
+        <span>FF TOURNAMENT PRO</span>
         <div class="coin-box">🪙 <span id="userCoins">0</span></div>
     </div>
+
     <div class="container">
-        <h3 style="color:var(--neon)">⚔️ LIVE MATCHES</h3>
         <div class="card">
-            <span class="tag tag-paid">PAID: 20 Coins</span>
-            <h4>🗺️ BERMUDA PRO</h4>
-            <p style="font-size:12px; color:#aaa;">Win: ₹100 | Per Kill: ₹5</p>
+            <h4 style="margin:0;">⚔️ BERMUDA MASTERS</h4>
+            <p style="font-size:12px; color:#aaa;">Entry: 20 Coins | Win: ₹100</p>
             <button class="join-btn" onclick="join(20)">JOIN MATCH</button>
         </div>
-        <div class="card">
-            <span class="tag tag-free">FREE MATCH</span>
-            <h4>🐺 LONE WOLF 1V1</h4>
-            <button class="join-btn" onclick="join(0)">JOIN FOR FREE</button>
-        </div>
     </div>
-    <div class="bottom-nav">
-        <div style="color:var(--neon)">🏠 Home</div>
-        <div>🏆 Results</div>
-        <div>👤 Profile</div>
-    </div>
+
+    <div id="toast"></div>
+
     <script>
+        // 1. Tumhari Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCslMTIwhSWh6vMDRXgzgBN...", 
+            authDomain: "ff-tonament-5995a.firebaseapp.com",
+            databaseURL: "https://ff-tonament-5995a-default-rtdb.firebaseio.com",
+            projectId: "ff-tonament-5995a",
+            appId: "1:907573402759:web:fa0c9da017f3047b336c22"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // 🛡️ LOGIN LOCK: Sabse pehle ye check karega
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                // Agar login nahi hai, toh turant login page par bhej do
+                window.location.href = "login.html";
+            } else {
+                // Agar login hai, toh coins load karo
+                loadCoins();
+            }
+        });
+
         const dbURL = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/users/nitesh_kumar/coins.json";
+
         function loadCoins() {
             fetch(dbURL).then(res => res.json()).then(data => {
                 document.getElementById('userCoins').innerText = data || 0;
             });
         }
+
         function join(fee) {
             let current = parseInt(document.getElementById('userCoins').innerText);
             if(current >= fee) {
                 fetch(dbURL, { method: 'PUT', body: JSON.stringify(current - fee) }).then(() => {
-                    alert("Match Joined!");
+                    showToast("✅ Match Joined Successfully!");
                     loadCoins();
                 });
-            } else { alert("Coins kam hain!"); }
+            } else { 
+                showToast("❌ Coins kam hain bhai!"); 
+            }
         }
-        setInterval(loadCoins, 3000);
-        loadCoins();
+
+        function showToast(msg) {
+            var x = document.getElementById("toast");
+            x.innerText = msg;
+            x.className = "show";
+            setTimeout(function(){ x.className = ""; }, 3000);
+        }
     </script>
 </body>
 </html>
