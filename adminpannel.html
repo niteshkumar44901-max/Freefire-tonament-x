@@ -1,15 +1,14 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Admin - Control Room</title>
     <style>
         body { font-family: sans-serif; background: #05050a; color: white; padding: 20px; }
         .card { background: #16213e; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-top: 4px solid #00f2ff; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #0a0a12; color: white; border: 1px solid #333; }
-        button { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #00f2ff; color: black; }
-        .wa-btn { background: #25D366; color: white; margin-top: 5px; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0a0a12; color: white; font-size: 16px; }
+        button { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #00f2ff; color: black; margin-top: 10px; }
+        .wa-btn { background: #25D366; color: white; }
         .room-btn { background: #ff0055; color: white; }
     </style>
 </head>
@@ -37,21 +36,35 @@
     </div>
 
     <script>
+        // Database Link
         const db = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/";
 
         function updateBermuda() {
-            let data = { entry: parseInt(document.getElementById('fee').value), win: document.getElementById('win').value };
-            fetch(db + "matches/bermuda.json", { method: 'PUT', body: JSON.stringify(data) }).then(() => alert("Match Updated!"));
+            let f = document.getElementById('fee').value;
+            let w = document.getElementById('win').value;
+            if(!f || !w) return alert("Khali mat chhodo!");
+            
+            let data = { entry: parseInt(f), win: w };
+            fetch(db + "matches/bermuda.json", { method: 'PUT', body: JSON.stringify(data) })
+            .then(() => alert("✅ Match Updated!"));
         }
 
         function updateRoom() {
-            let data = { id: document.getElementById('rid').value, pass: document.getElementById('rpass').value };
-            fetch(db + "room_details.json", { method: 'PUT', body: JSON.stringify(data) }).then(() => alert("ID/Pass Sent!"));
+            let i = document.getElementById('rid').value;
+            let p = document.getElementById('rpass').value;
+            if(!i || !p) return alert("ID/Pass dalo!");
+
+            let data = { id: i, pass: p };
+            fetch(db + "room_details.json", { method: 'PUT', body: JSON.stringify(data) })
+            .then(() => alert("✅ ID/Pass Sent to App!"));
         }
 
         function updateWA() {
             let link = document.getElementById('wa').value;
-            fetch(db + "settings/whatsapp.json", { method: 'PUT', body: JSON.stringify(link) }).then(() => alert("WA Link Updated!"));
+            if(!link) return alert("Link dalo!");
+
+            fetch(db + "settings/whatsapp.json", { method: 'PUT', body: JSON.stringify(link) })
+            .then(() => alert("✅ WhatsApp Link Updated!"));
         }
     </script>
 </body>
