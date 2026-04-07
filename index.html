@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -8,21 +9,27 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
     <style>
         :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; --pink: #ff0055; --green: #25D366; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 0; display: none; -webkit-text-size-adjust: 100%; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 0; display: none; }
         .header { background: #16213e; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--neon); position: sticky; top: 0; z-index: 100; }
         .coin-box { background: rgba(0,242,255,0.1); padding: 6px 15px; border-radius: 20px; border: 1px solid var(--neon); color: var(--neon); font-weight: bold; }
         .container { padding: 20px; }
         .card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; text-align: center; border-left: 5px solid var(--neon); }
         .match-title { margin: 0 0 10px 0; font-size: 20px; font-weight: 800; }
         .match-info { font-size: 14px; color: #bbb; margin-bottom: 15px; }
-        .join-btn { border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; background: var(--neon); color: #000; font-size: 14px; }
+        .join-btn { border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; background: var(--neon); color: #000; font-size: 14px; margin-bottom: 10px; }
+        .view-btn { border: 1px solid var(--neon); padding: 10px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; background: transparent; color: var(--neon); font-size: 13px; }
+        
+        /* ID-PASS MODAL */
+        #idPassModal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#16213e; padding:25px; border-radius:15px; border:2px solid var(--neon); z-index:1001; text-align:center; width:80%; box-shadow: 0 0 30px rgba(0,242,255,0.3); }
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; }
+        .detail-box { background: #0a0a12; padding: 10px; border-radius: 8px; margin: 10px 0; border: 1px dashed #444; }
+        
         #loader { display: flex; justify-content: center; align-items: center; height: 100vh; font-weight: bold; color: var(--neon); background: var(--bg); }
-        input:focus, select:focus { font-size: 16px !important; } /* Keyboard aane par zoom rokne ke liye */
     </style>
 </head>
 <body>
 
-    <div id="loader">SYNCING MATCHES...</div>
+    <div id="loader">FF TOURNAMENT LOADING...</div>
 
     <div id="main-content">
         <div class="header">
@@ -31,18 +38,28 @@
         </div>
 
         <div class="container">
-            <div class="card" id="card-bermuda">
+            <div class="card">
                 <h3 class="match-title" style="color: var(--neon);">⚔️ BERMUDA MASTERS</h3>
-                <div class="match-info" id="info-bermuda">Loading Prize...</div>
+                <div class="match-info" id="info-bermuda">Loading Match Data...</div>
                 <button class="join-btn" id="btn-bermuda" onclick="joinMatch(20)">JOIN MATCH</button>
-            </div>
-
-            <div class="card" id="card-lone" style="border-left-color: var(--pink);">
-                <h3 class="match-title" style="color: var(--pink);">🐺 LONE WOLF SPECIAL</h3>
-                <div class="match-info" id="info-lone">Loading Prize...</div>
-                <button class="join-btn" id="btn-lone" style="background: var(--pink); color:white;" onclick="joinMatch(10)">JOIN MATCH</button>
+                <button class="view-btn" onclick="viewIDPass()">VIEW ID / PASSWORD</button>
             </div>
         </div>
+    </div>
+
+    <div id="overlay" onclick="closeModal()"></div>
+    <div id="idPassModal">
+        <h3 style="color:var(--neon); margin-top:0;">🎮 ROOM DETAILS</h3>
+        <div class="detail-box">
+            <p style="color:#aaa; font-size:12px; margin:0;">ROOM ID</p>
+            <span id="displayID" style="font-size:20px; font-weight:bold; letter-spacing:2px;">---</span>
+        </div>
+        <div class="detail-box">
+            <p style="color:#aaa; font-size:12px; margin:0;">PASSWORD</p>
+            <span id="displayPass" style="font-size:20px; font-weight:bold; letter-spacing:2px;">---</span>
+        </div>
+        <p style="color:yellow; font-size:11px;">⚠️ ID/Pass kisi ko share mat karein!</p>
+        <button onclick="closeModal()" style="background:var(--pink); color:white; border:none; padding:10px; border-radius:8px; width:100%; font-weight:bold; margin-top:10px;">CLOSE</button>
     </div>
 
     <script>
@@ -54,7 +71,6 @@
             appId: "1:907573402759:web:fa0c9da017f3047b336c22"
         };
         firebase.initializeApp(firebaseConfig);
-
         const auth = firebase.auth();
         const dbURL = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/";
 
@@ -64,9 +80,7 @@
                 document.body.style.display = "block";
                 loadCoins();
                 loadMatches();
-            } else {
-                window.location.href = "login.html";
-            }
+            } else { window.location.href = "login.html"; }
         });
 
         function loadCoins() {
@@ -76,35 +90,42 @@
         }
 
         function loadMatches() {
-            fetch(dbURL + "matches.json").then(res => res.json()).then(data => {
+            fetch(dbURL + "matches/bermuda.json").then(res => res.json()).then(data => {
                 if(data) {
-                    document.getElementById('info-bermuda').innerHTML = `Entry: ${data.bermuda.entry} Coins | Win: ${data.bermuda.win}`;
-                    document.getElementById('btn-bermuda').setAttribute("onclick", `joinMatch(${data.bermuda.entry})`);
-                    
-                    document.getElementById('info-lone').innerHTML = `Entry: ${data.lonewolf.entry} Coins | Win: ${data.lonewolf.win}`;
-                    document.getElementById('btn-lone').setAttribute("onclick", `joinMatch(${data.lonewolf.entry})`);
+                    document.getElementById('info-bermuda').innerHTML = `Entry: ${data.entry} Coins | Win: ${data.win}`;
+                    document.getElementById('btn-bermuda').setAttribute("onclick", `joinMatch(${data.entry})`);
                 }
             });
         }
 
         function joinMatch(fee) {
             let coins = parseInt(document.getElementById('userCoins').innerText);
-            
-            // 📞 Admin settings se WhatsApp link uthayega (Yahan link database se aayega)
             fetch(dbURL + "settings/whatsapp.json").then(res => res.json()).then(waLink => {
                 if(coins >= fee) {
-                    if(confirm("Bhai " + fee + " coins katenge. Join karke WhatsApp group mein jayein?")) {
+                    if(confirm("Join Match? " + fee + " coins katenge.")) {
                         fetch(dbURL + "users/nitesh_kumar/coins.json", { method: 'PUT', body: JSON.stringify(coins - fee) })
                         .then(() => {
-                            alert("✅ Join Success! Group Join karein.");
+                            alert("✅ Joined! Group join karein aur match time par ID-Pass check karein.");
                             loadCoins();
-                            window.location.href = waLink || "https://wa.me/91XXXXXXXXXX"; // Default link agar database khali ho
+                            window.location.href = waLink;
                         });
                     }
-                } else {
-                    alert("❌ Coins kam hain bhai!");
-                }
+                } else { alert("❌ Coins kam hain!"); }
             });
+        }
+
+        function viewIDPass() {
+            fetch(dbURL + "room_details.json").then(res => res.json()).then(data => {
+                document.getElementById('displayID').innerText = data.id || "WAIT...";
+                document.getElementById('displayPass').innerText = data.pass || "WAIT...";
+                document.getElementById('idPassModal').style.display = "block";
+                document.getElementById('overlay').style.display = "block";
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('idPassModal').style.display = "none";
+            document.getElementById('overlay').style.display = "none";
         }
     </script>
 </body>
