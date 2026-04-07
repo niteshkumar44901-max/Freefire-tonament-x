@@ -8,80 +8,101 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
     
     <style>
-        :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; --gold: #f1c40f; }
-        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 0; }
+        :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; }
+        body { 
+            font-family: sans-serif; 
+            background: var(--bg); 
+            color: white; 
+            margin: 0; 
+            padding: 0; 
+            display: none; /* Login check hone tak page chhupa rahega */
+        }
         .header { background: #16213e; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--neon); position: sticky; top: 0; z-index: 100; }
         .coin-box { background: rgba(0,242,255,0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--neon); color: var(--neon); font-weight: bold; }
-        .container { padding: 15px; padding-bottom: 80px; }
-        .card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
-        button.join-btn { background: var(--neon); color: #000; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; margin-top: 10px; cursor: pointer; width: 100%; }
-        #toast { visibility: hidden; min-width: 250px; background-color: #27ae60; color: #fff; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 80px; transform: translateX(-50%); font-weight: bold; }
-        #toast.show { visibility: visible; }
+        .container { padding: 15px; }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .match-title { color: var(--neon); margin: 0 0 10px 0; font-size: 18px; }
+        .match-info { font-size: 13px; color: #aaa; margin-bottom: 15px; }
+        .join-btn { background: var(--neon); color: #000; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        
+        /* Loading Text */
+        #loader { 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; font-weight: bold; color: var(--neon); background: var(--bg);
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <span>FF TOURNAMENT PRO</span>
-        <div class="coin-box">🪙 <span id="userCoins">0</span></div>
-    </div>
 
-    <div class="container">
-        <div class="card">
-            <h4 style="margin:0;">⚔️ BERMUDA MASTERS</h4>
-            <p style="font-size:12px; color:#aaa;">Entry: 20 Coins | Win: ₹100</p>
-            <button class="join-btn" onclick="join(20)">JOIN MATCH</button>
+    <div id="loader">Checking Player Status...</div>
+
+    <div id="main-content">
+        <div class="header">
+            <span>FF TOURNAMENT PRO</span>
+            <div class="coin-box">🪙 <span id="userCoins">0</span></div>
+        </div>
+
+        <div class="container">
+            <div class="card">
+                <h3 class="match-title">⚔️ BERMUDA MASTERS</h3>
+                <div class="match-info">
+                    Entry Fee: 20 Coins | Prize Pool: ₹100 <br>
+                    Map: Bermuda | Mode: Solo
+                </div>
+                <button class="join-btn" onclick="joinMatch(20)">JOIN MATCH</button>
+            </div>
         </div>
     </div>
 
-    <div id="toast"></div>
-
     <script>
-        // 1. Tumhari Firebase Config
+        // ✅ Tumhari Asli Firebase Config
         const firebaseConfig = {
-            apiKey: "AIzaSyCslMTIwhSWh6vMDRXgzgBN...", 
+            apiKey: "AIzaSyCSlWTIwhSWh6vMDRXgzg0NAAOhJikrYME",
             authDomain: "ff-tonament-5995a.firebaseapp.com",
             databaseURL: "https://ff-tonament-5995a-default-rtdb.firebaseio.com",
             projectId: "ff-tonament-5995a",
+            storageBucket: "ff-tonament-5995a.firebasestorage.app",
+            messagingSenderId: "907573402759",
             appId: "1:907573402759:web:fa0c9da017f3047b336c22"
         };
-        firebase.initializeApp(firebaseConfig);
 
-        // 🛡️ LOGIN LOCK: Sabse pehle ye check karega
-        firebase.auth().onAuthStateChanged(user => {
-            if (!user) {
-                // Agar login nahi hai, toh turant login page par bhej do
-                window.location.href = "login.html";
-            } else {
-                // Agar login hai, toh coins load karo
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // 🛡️ SMART LOGIN CHECK (Fixes Reload Loop)
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User login hai! Page dikhao aur loader hatao
+                document.getElementById('loader').style.display = "none";
+                document.body.style.display = "block";
                 loadCoins();
+            } else {
+                // User login nahi hai! Turant login page par bhejo
+                window.location.href = "login.html";
             }
         });
 
+        // Coins database link
         const dbURL = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/users/nitesh_kumar/coins.json";
 
         function loadCoins() {
             fetch(dbURL).then(res => res.json()).then(data => {
                 document.getElementById('userCoins').innerText = data || 0;
-            });
+            }).catch(err => console.error("Coins load nahi huye:", err));
         }
 
-        function join(fee) {
-            let current = parseInt(document.getElementById('userCoins').innerText);
-            if(current >= fee) {
-                fetch(dbURL, { method: 'PUT', body: JSON.stringify(current - fee) }).then(() => {
-                    showToast("✅ Match Joined Successfully!");
+        function joinMatch(fee) {
+            let coins = parseInt(document.getElementById('userCoins').innerText);
+            if(coins >= fee) {
+                // Coins kato aur update karo
+                fetch(dbURL, { method: 'PUT', body: JSON.stringify(coins - fee) })
+                .then(() => {
+                    alert("✅ Success! Aap match mein join ho gaye ho.");
                     loadCoins();
                 });
-            } else { 
-                showToast("❌ Coins kam hain bhai!"); 
+            } else {
+                alert("❌ Coins kam hain bhai! Recharge karo.");
             }
-        }
-
-        function showToast(msg) {
-            var x = document.getElementById("toast");
-            x.innerText = msg;
-            x.className = "show";
-            setTimeout(function(){ x.className = ""; }, 3000);
         }
     </script>
 </body>
