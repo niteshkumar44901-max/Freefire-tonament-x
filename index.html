@@ -1,120 +1,78 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>FF Tournament Pro</title>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
     <style>
-        :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; --pink: #ff0055; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 0; display: none; }
-        .header { background: #16213e; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--neon); position: sticky; top: 0; z-index: 100; }
-        .coin-box { background: rgba(0,242,255,0.1); padding: 6px 15px; border-radius: 20px; border: 1px solid var(--neon); color: var(--neon); font-weight: bold; }
-        .container { padding: 20px; }
-        .card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; text-align: center; border-left: 5px solid var(--neon); }
-        .match-title { margin: 0 0 10px 0; font-size: 20px; font-weight: 800; }
-        .match-info { font-size: 14px; color: #bbb; margin-bottom: 15px; }
-        .join-btn { border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; background: var(--neon); color: #000; font-size: 14px; margin-bottom: 10px; }
-        .view-btn { border: 1px solid var(--neon); padding: 10px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; background: transparent; color: var(--neon); font-size: 13px; display: block; margin: 0 auto; }
-        
-        /* ID-PASS POPUP STYLES */
-        #idPassModal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#16213e; padding:25px; border-radius:15px; border:2px solid var(--neon); z-index:1001; text-align:center; width:80%; box-shadow: 0 0 30px rgba(0,242,255,0.5); }
-        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; }
-        .detail-box { background: #0a0a12; padding: 10px; border-radius: 8px; margin: 10px 0; border: 1px dashed #444; }
-        #loader { display: flex; justify-content: center; align-items: center; height: 100vh; font-weight: bold; color: var(--neon); background: var(--bg); }
+        :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; }
+        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; border-left: 5px solid #ffcc00; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .prize-row { display: flex; justify-content: space-around; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin: 15px 0; font-size: 13px; }
+        .join-btn { width: 100%; padding: 12px; background: var(--neon); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        .view-btn { width: 100%; padding: 10px; background: transparent; color: var(--neon); border: 1px solid var(--neon); border-radius: 8px; font-weight: bold; cursor: pointer; }
+        #idModal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#16213e; padding:20px; border-radius:15px; border:2px solid var(--neon); width:80%; z-index:100; text-align:center; }
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:90; }
     </style>
 </head>
 <body>
 
-    <div id="loader">FF TOURNAMENT LOADING...</div>
+    <h2 style="text-align:center; color:var(--neon);">FF TOURNAMENT PRO</h2>
 
-    <div id="main-content">
-        <div class="header">
-            <span style="font-weight:900;">FF TOURNAMENT PRO</span>
-            <div class="coin-box">🪙 <span id="userCoins">0</span></div>
-        </div>
-
-        <div class="container">
-            <div class="card">
-                <h3 class="match-title" style="color: var(--neon);">⚔️ BERMUDA MASTERS</h3>
-                <div class="match-info" id="info-bermuda">Entry: 20 Coins | Win: ₹100</div>
-                <button class="join-btn" onclick="joinMatch(20)">JOIN MATCH</button>
-                <button class="view-btn" onclick="viewIDPass()">VIEW ID / PASSWORD</button>
+    <div class="card">
+        <h3 style="margin:0;">⚔️ BERMUDA SOLO</h3>
+        
+        <div class="prize-row">
+            <div><p style="margin:0; color:#aaa;">Entry</p><b id="displayEntry">₹20</b></div>
+            <div style="border-left:1px solid #444; border-right:1px solid #444; padding:0 10px;">
+                <p style="margin:0; color:#aaa;">Per Kill</p><b id="displayPK" style="color:#ffcc00;">₹5</b>
             </div>
+            <div><p style="margin:0; color:#aaa;">Booyah</p><b id="displayWin" style="color:#25D366;">₹100</b></div>
         </div>
+
+        <button class="join-btn" onclick="join()">JOIN MATCH</button>
+        <button class="view-btn" onclick="show()">VIEW ID / PASSWORD</button>
     </div>
 
-    <div id="overlay" onclick="closeModal()"></div>
-    <div id="idPassModal">
-        <h3 style="color:var(--neon); margin-top:0;">🎮 ROOM DETAILS</h3>
-        <div class="detail-box">
-            <p style="color:#aaa; font-size:12px; margin:0;">ROOM ID</p>
-            <span id="displayID" style="font-size:20px; font-weight:bold; letter-spacing:2px;">---</span>
-        </div>
-        <div class="detail-box">
-            <p style="color:#aaa; font-size:12px; margin:0;">PASSWORD</p>
-            <span id="displayPass" style="font-size:20px; font-weight:bold; letter-spacing:2px;">---</span>
-        </div>
-        <button onclick="closeModal()" style="background:var(--pink); color:white; border:none; padding:10px; border-radius:8px; width:100%; font-weight:bold; margin-top:10px;">CLOSE</button>
+    <div id="overlay" onclick="hide()"></div>
+    <div id="idModal">
+        <h3>🎮 ROOM DETAILS</h3>
+        <p>ID: <span id="rid" style="font-weight:bold; color:var(--neon);">---</span></p>
+        <p>PASS: <span id="rpass" style="font-weight:bold; color:var(--neon);">---</span></p>
+        <button onclick="hide()" style="width:100%; background:#ff0055; color:white; border:none; padding:10px; border-radius:8px;">CLOSE</button>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCSlWTIwhSWh6vMDRXgzg0NAAOhJikrYME",
-            authDomain: "ff-tonament-5995a.firebaseapp.com",
-            databaseURL: "https://ff-tonament-5995a-default-rtdb.firebaseio.com",
-            projectId: "ff-tonament-5995a",
-            appId: "1:907573402759:web:fa0c9da017f3047b336c22"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const dbURL = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/";
+        const db = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/match_settings.json";
 
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById('loader').style.display = "none";
-                document.body.style.display = "block";
-                loadCoins();
-            } else { window.location.href = "login.html"; }
-        });
-
-        function loadCoins() {
-            fetch(dbURL + "users/nitesh_kumar/coins.json").then(res => res.json()).then(data => {
-                document.getElementById('userCoins').innerText = data || 0;
-            });
-        }
-
-        function joinMatch(fee) {
-            let coins = parseInt(document.getElementById('userCoins').innerText);
-            if(coins >= fee) {
-                if(confirm("Join Match?")) {
-                    fetch(dbURL + "users/nitesh_kumar/coins.json", { method: 'PUT', body: JSON.stringify(coins - fee) })
-                    .then(() => {
-                        alert("✅ Joined! WhatsApp link khul raha hai...");
-                        window.location.href = "https://chat.whatsapp.com/CanP81lzBVo6gQkpe0suHx";
-                    });
-                }
-            } else { alert("Coins kam hain!"); }
-        }
-
-        // 🔥 Ye function ab pakka popup kholega
-        function viewIDPass() {
-            console.log("Button clicked!"); // Debugging ke liye
-            document.getElementById('idPassModal').style.display = "block";
-            document.getElementById('overlay').style.display = "block";
-            
-            fetch(dbURL + "room_details.json").then(res => res.json()).then(data => {
+        // Database se data load karna
+        function loadData() {
+            fetch(db).then(res => res.json()).then(data => {
                 if(data) {
-                    document.getElementById('displayID').innerText = data.id || "WAITING...";
-                    document.getElementById('displayPass').innerText = data.pass || "WAITING...";
+                    document.getElementById('displayWin').innerText = "₹" + data.win;
+                    document.getElementById('displayPK').innerText = "₹" + data.perkill;
+                    document.getElementById('rid').innerText = data.id;
+                    document.getElementById('rpass').innerText = data.pass;
                 }
-            }).catch(err => {
-                document.getElementById('displayID').innerText = "ERROR";
             });
         }
+        loadData();
 
-        function closeModal() {
-            document.getElementById('idPassModal').style.display = "none";
+        function join() {
+            if(confirm("Join Match? ₹20 katenge.")) {
+                alert("✅ Joined! WhatsApp Group Join Karein.");
+                window.location.href = "https://chat.whatsapp.com/CanP81lzBVo6gQkpe0suHx";
+            }
+        }
+
+        function show() {
+            document.getElementById('idModal').style.display = "block";
+            document.getElementById('overlay').style.display = "block";
+        }
+
+        function hide() {
+            document.getElementById('idModal').style.display = "none";
             document.getElementById('overlay').style.display = "none";
         }
     </script>
