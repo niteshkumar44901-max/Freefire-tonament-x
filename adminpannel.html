@@ -1,1 +1,21 @@
 
+<div class="box">
+    <h3>🔑 Room ID & Password</h3>
+    <input type="text" id="room_id" placeholder="Room ID (e.g. 882910)">
+    <input type="text" id="room_pass" placeholder="Password (e.g. 123)">
+    <button onclick="updateRoom()">SEND ID/PASS</button>
+</div>
+
+<script>
+function updateRoom() {
+    let id = document.getElementById('room_id').value;
+    let pass = document.getElementById('room_pass').value;
+    
+    let roomData = { id: id, pass: pass };
+    
+    fetch("https://ff-tonament-5995a-default-rtdb.firebaseio.com/room_details.json", {
+        method: 'PUT',
+        body: JSON.stringify(roomData)
+    }).then(() => alert("✅ ID-Password bhej diya gaya hai!"));
+}
+</script>
