@@ -3,72 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FF Tournament Login</title>
+    <title>Player Login - FF Tournament</title>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
     <style>
-        body { font-family: sans-serif; background: #0a0a12; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: #16213e; padding: 25px; border-radius: 15px; width: 85%; max-width: 350px; text-align: center; border: 1px solid #00f2ff; box-shadow: 0 0 20px rgba(0,242,255,0.2); }
-        h2 { color: #00f2ff; margin-bottom: 20px; font-size: 20px; }
-        .btn { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; }
+        :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .login-card { background: var(--card); padding: 30px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(0, 242, 255, 0.3); box-shadow: 0 0 30px rgba(0, 242, 255, 0.1); }
+        h2 { color: var(--neon); margin-bottom: 5px; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
+        p { color: #888; font-size: 14px; margin-bottom: 25px; }
+        .btn { width: 100%; padding: 14px; margin: 12px 0; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 15px; transition: 0.3s; }
         .btn-google { background: white; color: #000; }
-        .btn-phone { background: #00f2ff; color: #000; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0a0a12; color: white; box-sizing: border-box; text-align: center; }
-        #recaptcha-container { margin: 10px 0; }
+        .btn-google:hover { background: #e6e6e6; }
+        .btn-phone { background: var(--neon); color: #000; box-shadow: 0 0 15px rgba(0, 242, 255, 0.4); }
+        .btn-phone:hover { opacity: 0.9; transform: translateY(-2px); }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #05050a; color: white; box-sizing: border-box; text-align: center; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--neon); }
+        #recaptcha-container { margin: 15px 0; display: flex; justify-content: center; }
+        .divider { margin: 20px 0; color: #444; font-size: 12px; display: flex; align-items: center; gap: 10px; }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #333; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
     <h2>🎮 PLAYER LOGIN</h2>
+    <p>Tournament mein entry ke liye login karein</p>
     
     <button class="btn btn-google" onclick="googleLogin()">
-        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18"> Google se Login
+        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20"> Sign in with Google
     </button>
 
-    <div style="margin:15px; color:#555">── YA ──</div>
+    <div class="divider">OR</div>
 
     <div id="phone-section">
         <input type="text" id="phone" placeholder="+91 9876543210">
         <div id="recaptcha-container"></div>
-        <button class="btn btn-phone" onclick="sendOTP()">OTP Bhejein</button>
+        <button class="btn btn-phone" onclick="sendOTP()">SEND OTP</button>
     </div>
 
     <div id="otp-section" style="display:none">
-        <input type="text" id="otp" placeholder="OTP Code Daalein">
-        <button class="btn btn-phone" onclick="verifyOTP()">Verify & Login</button>
+        <input type="text" id="otp" placeholder="Enter 6-Digit OTP">
+        <button class="btn btn-phone" onclick="verifyOTP()">VERIFY & LOGIN</button>
     </div>
 </div>
 
 <script>
-    // --- Tumhari Firebase Config ---
+    // ✅ Tumhari Asli Firebase Config (Auto-set)
     const firebaseConfig = {
-        apiKey: "AIzaSyCslMTIwhSWh6vMDRXgzgBN...", // Pura code Firebase se match hai
+        apiKey: "AIzaSyCSlWTIwhSWh6vMDRXgzg0NAAOhJikrYME",
         authDomain: "ff-tonament-5995a.firebaseapp.com",
         databaseURL: "https://ff-tonament-5995a-default-rtdb.firebaseio.com",
         projectId: "ff-tonament-5995a",
-        storageBucket: "ff-tonament-5995a.appspot.com",
+        storageBucket: "ff-tonament-5995a.firebasestorage.app",
         messagingSenderId: "907573402759",
-        appId: "1:907573402759:web:fa0c9da017f3047b336c22"
+        appId: "1:907573402759:web:fa0c9da017f3047b336c22",
+        measurementId: "G-K2N3B5PJL0"
     };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Google Sign-In
+    // 1. Google Login
     function googleLogin() {
         const provider = new firebase.auth.GoogleAuthProvider();
         auth.signInWithPopup(provider).then(() => {
             window.location.href = "index.html";
-        }).catch(e => alert("Error: " + e.message));
+        }).catch(e => {
+            console.error(e);
+            alert("Error: " + e.message);
+        });
     }
 
-    // Phone Sign-In
+    // 2. Phone OTP Login
     function sendOTP() {
         const ph = document.getElementById('phone').value;
-        if(ph.length < 10) return alert("Sahi number daalein!");
+        if(ph.length < 10) return alert("Bhai, sahi mobile number daalo!");
         
-        const verifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+        const verifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'normal'
+        });
+
         auth.signInWithPhoneNumber(ph, verifier).then(res => {
             window.confirmationResult = res;
             document.getElementById('phone-section').style.display = 'none';
@@ -81,13 +96,14 @@
         const code = document.getElementById('otp').value;
         confirmationResult.confirm(code).then(() => {
             window.location.href = "index.html";
-        }).catch(e => alert("Galat OTP!"));
+        }).catch(e => alert("Galat OTP hai bhai, firse try karo!"));
     }
 
-    // Pehle se login ho toh seedha index par bhejo
+    // Check if already logged in
     auth.onAuthStateChanged(user => {
         if (user) window.location.href = "index.html";
     });
 </script>
+
 </body>
 </html>
