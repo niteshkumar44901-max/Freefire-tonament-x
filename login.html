@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF Tournament Login</title>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #0a0a12; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: #16213e; padding: 25px; border-radius: 15px; width: 85%; max-width: 350px; text-align: center; border: 1px solid #00f2ff; box-shadow: 0 0 20px rgba(0,242,255,0.2); }
+        h2 { color: #00f2ff; margin-bottom: 20px; font-size: 20px; }
+        .btn { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; }
+        .btn-google { background: white; color: #000; }
+        .btn-phone { background: #00f2ff; color: #000; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0a0a12; color: white; box-sizing: border-box; text-align: center; }
+        #recaptcha-container { margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>🎮 PLAYER LOGIN</h2>
+    
+    <button class="btn btn-google" onclick="googleLogin()">
+        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18"> Google se Login
+    </button>
+
+    <div style="margin:15px; color:#555">── YA ──</div>
+
+    <div id="phone-section">
+        <input type="text" id="phone" placeholder="+91 9876543210">
+        <div id="recaptcha-container"></div>
+        <button class="btn btn-phone" onclick="sendOTP()">OTP Bhejein</button>
+    </div>
+
+    <div id="otp-section" style="display:none">
+        <input type="text" id="otp" placeholder="OTP Code Daalein">
+        <button class="btn btn-phone" onclick="verifyOTP()">Verify & Login</button>
+    </div>
+</div>
+
+<script>
+    // --- Tumhari Firebase Config ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyCslMTIwhSWh6vMDRXgzgBN...", // Pura code Firebase se match hai
+        authDomain: "ff-tonament-5995a.firebaseapp.com",
+        databaseURL: "https://ff-tonament-5995a-default-rtdb.firebaseio.com",
+        projectId: "ff-tonament-5995a",
+        storageBucket: "ff-tonament-5995a.appspot.com",
+        messagingSenderId: "907573402759",
+        appId: "1:907573402759:web:fa0c9da017f3047b336c22"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Google Sign-In
+    function googleLogin() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).then(() => {
+            window.location.href = "index.html";
+        }).catch(e => alert("Error: " + e.message));
+    }
+
+    // Phone Sign-In
+    function sendOTP() {
+        const ph = document.getElementById('phone').value;
+        if(ph.length < 10) return alert("Sahi number daalein!");
+        
+        const verifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+        auth.signInWithPhoneNumber(ph, verifier).then(res => {
+            window.confirmationResult = res;
+            document.getElementById('phone-section').style.display = 'none';
+            document.getElementById('otp-section').style.display = 'block';
+            alert("OTP bhej diya gaya hai!");
+        }).catch(e => alert(e.message));
+    }
+
+    function verifyOTP() {
+        const code = document.getElementById('otp').value;
+        confirmationResult.confirm(code).then(() => {
+            window.location.href = "index.html";
+        }).catch(e => alert("Galat OTP!"));
+    }
+
+    // Pehle se login ho toh seedha index par bhejo
+    auth.onAuthStateChanged(user => {
+        if (user) window.location.href = "index.html";
+    });
+</script>
+</body>
+</html>
