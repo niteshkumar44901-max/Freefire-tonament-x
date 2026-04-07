@@ -53,13 +53,11 @@
     </div>
 
     <script>
-        // Firebase link (Check kar lena sahi hai na)
         const dbURL = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/match_data.json";
 
-        // Apna WhatsApp Group Link yahan dalo
-        const myWhatsApp = "https://chat.whatsapp.com/CanP81lzBVo6gQkpe0suHx";
+        // Tumhara Naya WhatsApp Link yahan fix kar diya hai
+        const myWhatsApp = "https://chat.whatsapp.com/CanP81lzBVo6gQkpe0suHx?mode=gi_t";
 
-        // Database se data load karne ke liye
         function loadData() {
             fetch(dbURL)
             .then(res => res.json())
@@ -74,23 +72,19 @@
             .catch(err => console.log("Data error:", err));
         }
 
-        // Har 3 second mein refresh karega
         setInterval(loadData, 3000);
         loadData();
 
-        // Join button dabane par WhatsApp khulega
         function join() {
-            alert("✅ Successfully Joined! Ab humare WhatsApp group mein join ho jaiye.");
-            window.location.href = myWhatsApp;
+            alert("✅ Joining... WhatsApp Group Join Karein!");
+            window.open(myWhatsApp, "_blank"); 
         }
 
-        // Modal dikhane ke liye
         function show() {
             document.getElementById('idModal').style.display = "block";
             document.getElementById('overlay').style.display = "block";
         }
 
-        // Modal chhupane ke liye
         function hide() {
             document.getElementById('idModal').style.display = "none";
             document.getElementById('overlay').style.display = "none";
