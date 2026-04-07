@@ -2,21 +2,22 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>FF Tournament Pro</title>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
     <style>
-        :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; --pink: #ff0055; --green: #27ae60; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 0; display: none; }
+        :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; --pink: #ff0055; --green: #25D366; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 0; display: none; -webkit-text-size-adjust: 100%; }
         .header { background: #16213e; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--neon); position: sticky; top: 0; z-index: 100; }
         .coin-box { background: rgba(0,242,255,0.1); padding: 6px 15px; border-radius: 20px; border: 1px solid var(--neon); color: var(--neon); font-weight: bold; }
         .container { padding: 20px; }
         .card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; text-align: center; border-left: 5px solid var(--neon); }
         .match-title { margin: 0 0 10px 0; font-size: 20px; font-weight: 800; }
         .match-info { font-size: 14px; color: #bbb; margin-bottom: 15px; }
-        .join-btn { border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; background: var(--neon); color: #000; }
+        .join-btn { border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; background: var(--neon); color: #000; font-size: 14px; }
         #loader { display: flex; justify-content: center; align-items: center; height: 100vh; font-weight: bold; color: var(--neon); background: var(--bg); }
+        input:focus, select:focus { font-size: 16px !important; } /* Keyboard aane par zoom rokne ke liye */
     </style>
 </head>
 <body>
@@ -62,7 +63,7 @@
                 document.getElementById('loader').style.display = "none";
                 document.body.style.display = "block";
                 loadCoins();
-                loadMatches(); // Matches load karega
+                loadMatches();
             } else {
                 window.location.href = "login.html";
             }
@@ -74,16 +75,13 @@
             });
         }
 
-        // 🔥 Ye function Admin Panel se prize uthayega
         function loadMatches() {
             fetch(dbURL + "matches.json").then(res => res.json()).then(data => {
                 if(data) {
-                    // Update Bermuda
-                    document.getElementById('info-bermuda').innerHTML = `Entry Fee: ${data.bermuda.entry} Coins | Win: ${data.bermuda.win}`;
+                    document.getElementById('info-bermuda').innerHTML = `Entry: ${data.bermuda.entry} Coins | Win: ${data.bermuda.win}`;
                     document.getElementById('btn-bermuda').setAttribute("onclick", `joinMatch(${data.bermuda.entry})`);
                     
-                    // Update Lone Wolf
-                    document.getElementById('info-lone').innerHTML = `Entry Fee: ${data.lonewolf.entry} Coins | Win: ${data.lonewolf.win}`;
+                    document.getElementById('info-lone').innerHTML = `Entry: ${data.lonewolf.entry} Coins | Win: ${data.lonewolf.win}`;
                     document.getElementById('btn-lone').setAttribute("onclick", `joinMatch(${data.lonewolf.entry})`);
                 }
             });
@@ -91,15 +89,22 @@
 
         function joinMatch(fee) {
             let coins = parseInt(document.getElementById('userCoins').innerText);
-            if(coins >= fee) {
-                fetch(dbURL + "users/nitesh_kumar/coins.json", { method: 'PUT', body: JSON.stringify(coins - fee) })
-                .then(() => {
-                    alert("✅ Success! Aap match mein join ho gaye.");
-                    loadCoins();
-                });
-            } else {
-                alert("❌ Bhai coins kam hain!");
-            }
+            
+            // 📞 Admin settings se WhatsApp link uthayega (Yahan link database se aayega)
+            fetch(dbURL + "settings/whatsapp.json").then(res => res.json()).then(waLink => {
+                if(coins >= fee) {
+                    if(confirm("Bhai " + fee + " coins katenge. Join karke WhatsApp group mein jayein?")) {
+                        fetch(dbURL + "users/nitesh_kumar/coins.json", { method: 'PUT', body: JSON.stringify(coins - fee) })
+                        .then(() => {
+                            alert("✅ Join Success! Group Join karein.");
+                            loadCoins();
+                            window.location.href = waLink || "https://wa.me/91XXXXXXXXXX"; // Default link agar database khali ho
+                        });
+                    }
+                } else {
+                    alert("❌ Coins kam hain bhai!");
+                }
+            });
         }
     </script>
 </body>
