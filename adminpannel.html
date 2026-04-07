@@ -1,21 +1,58 @@
 
-<div class="box">
-    <h3>🔑 Room ID & Password</h3>
-    <input type="text" id="room_id" placeholder="Room ID (e.g. 882910)">
-    <input type="text" id="room_pass" placeholder="Password (e.g. 123)">
-    <button onclick="updateRoom()">SEND ID/PASS</button>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Control Room</title>
+    <style>
+        body { font-family: sans-serif; background: #05050a; color: white; padding: 20px; }
+        .card { background: #16213e; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-top: 4px solid #00f2ff; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #0a0a12; color: white; border: 1px solid #333; }
+        button { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #00f2ff; color: black; }
+        .wa-btn { background: #25D366; color: white; margin-top: 5px; }
+        .room-btn { background: #ff0055; color: white; }
+    </style>
+</head>
+<body>
+    <h2>🚀 ADMIN CONTROL</h2>
 
-<script>
-function updateRoom() {
-    let id = document.getElementById('room_id').value;
-    let pass = document.getElementById('room_pass').value;
-    
-    let roomData = { id: id, pass: pass };
-    
-    fetch("https://ff-tonament-5995a-default-rtdb.firebaseio.com/room_details.json", {
-        method: 'PUT',
-        body: JSON.stringify(roomData)
-    }).then(() => alert("✅ ID-Password bhej diya gaya hai!"));
-}
-</script>
+    <div class="card">
+        <h3>⚔️ Bermuda Match Prize</h3>
+        <input type="number" id="fee" placeholder="Entry Fee">
+        <input type="text" id="win" placeholder="Prize Money (e.g. ₹100)">
+        <button onclick="updateBermuda()">UPDATE MATCH</button>
+    </div>
+
+    <div class="card">
+        <h3>🔑 Room ID & Password</h3>
+        <input type="text" id="rid" placeholder="Room ID">
+        <input type="text" id="rpass" placeholder="Room Password">
+        <button class="room-btn" onclick="updateRoom()">SEND ID/PASS TO APP</button>
+    </div>
+
+    <div class="card">
+        <h3>🔗 WhatsApp Link</h3>
+        <input type="text" id="wa" placeholder="https://chat.whatsapp.com/...">
+        <button class="wa-btn" onclick="updateWA()">SAVE WA LINK</button>
+    </div>
+
+    <script>
+        const db = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/";
+
+        function updateBermuda() {
+            let data = { entry: parseInt(document.getElementById('fee').value), win: document.getElementById('win').value };
+            fetch(db + "matches/bermuda.json", { method: 'PUT', body: JSON.stringify(data) }).then(() => alert("Match Updated!"));
+        }
+
+        function updateRoom() {
+            let data = { id: document.getElementById('rid').value, pass: document.getElementById('rpass').value };
+            fetch(db + "room_details.json", { method: 'PUT', body: JSON.stringify(data) }).then(() => alert("ID/Pass Sent!"));
+        }
+
+        function updateWA() {
+            let link = document.getElementById('wa').value;
+            fetch(db + "settings/whatsapp.json", { method: 'PUT', body: JSON.stringify(link) }).then(() => alert("WA Link Updated!"));
+        }
+    </script>
+</body>
+</html>
