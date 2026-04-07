@@ -1,28 +1,129 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF Tournament Pro</title>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
+    
+    <style>
+        :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; --pink: #ff0055; --green: #27ae60; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 0; display: none; }
+        
+        /* Header & Coins */
+        .header { background: #16213e; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--neon); position: sticky; top: 0; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .coin-box { background: rgba(0,242,255,0.1); padding: 6px 15px; border-radius: 20px; border: 1px solid var(--neon); color: var(--neon); font-weight: bold; font-size: 14px; }
+        
+        .container { padding: 20px; padding-bottom: 50px; }
+        h2 { font-size: 18px; margin-bottom: 20px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Match Card Design */
+        .card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; text-align: center; position: relative; overflow: hidden; transition: 0.3s; }
+        .card:active { transform: scale(0.98); }
+        .match-title { margin: 0 0 10px 0; font-size: 20px; font-weight: 800; }
+        .match-info { font-size: 13px; color: #bbb; line-height: 1.6; margin-bottom: 15px; }
+        
+        /* Buttons */
+        .join-btn { border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 14px; color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
+        /* Specific Colors */
+        .c-bermuda { border-left: 5px solid var(--neon); }
+        .btn-bermuda { background: var(--neon); }
+        .c-lone { border-left: 5px solid var(--pink); }
+        .btn-lone { background: var(--pink); color: white; }
+        .c-free { border-left: 5px solid var(--green); }
+        .btn-free { background: var(--green); color: white; }
+
+        #loader { display: flex; justify-content: center; align-items: center; height: 100vh; font-weight: bold; color: var(--neon); background: var(--bg); }
+    </style>
+</head>
+<body>
+
+    <div id="loader">LOADING PLAYER DATA...</div>
+
+    <div id="main-content">
+        <div class="header">
+            <span style="font-weight:900; letter-spacing:1px;">FF TOURNAMENT PRO</span>
+            <div class="coin-box">🪙 <span id="userCoins">0</span></div>
+        </div>
+
         <div class="container">
-            <div class="card">
-                <h3 class="match-title">⚔️ BERMUDA MASTERS</h3>
+            <h2>🏆 Live Tournaments</h2>
+
+            <div class="card c-bermuda">
+                <h3 class="match-title" style="color: var(--neon);">⚔️ BERMUDA MASTERS</h3>
                 <div class="match-info">
                     Entry Fee: 20 Coins | Win: ₹100 <br>
                     Map: Bermuda | Mode: Solo
                 </div>
-                <button class="join-btn" onclick="joinMatch(20)">JOIN MATCH</button>
+                <button class="join-btn btn-bermuda" onclick="joinMatch(20)">JOIN MATCH</button>
             </div>
 
-            <div class="card" style="border-color: #ff0055;">
-                <h3 class="match-title" style="color: #ff0055;">🐺 LONE WOLF SPECIAL</h3>
+            <div class="card c-lone">
+                <h3 class="match-title" style="color: var(--pink);">🐺 LONE WOLF SPECIAL</h3>
                 <div class="match-info">
                     Entry Fee: 10 Coins | Win: ₹50 <br>
                     Map: Lone Wolf | Mode: 2v2
                 </div>
-                <button class="join-btn" style="background: #ff0055;" onclick="joinMatch(10)">JOIN MATCH</button>
+                <button class="join-btn btn-lone" onclick="joinMatch(10)">JOIN MATCH</button>
             </div>
 
-            <div class="card" style="border-color: #27ae60;">
-                <h3 class="match-title" style="color: #27ae60;">🔥 1v1 PRACTICE BATTLE</h3>
+            <div class="card c-free">
+                <h3 class="match-title" style="color: var(--green);">🔥 1v1 FREE BATTLE</h3>
                 <div class="match-info">
-                    Entry Fee: 0 Coins (FREE) | Win: Respect <br>
+                    Entry Fee: 0 Coins (FREE) | Win: Practice <br>
                     Map: Small Map | Mode: 1v1
                 </div>
-                <button class="join-btn" style="background: #27ae60;" onclick="joinMatch(0)">JOIN FOR FREE</button>
+                <button class="join-btn btn-free" onclick="joinMatch(0)">JOIN FOR FREE</button>
             </div>
         </div>
+    </div>
+
+    <script>
+        // ✅ Your Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCSlWTIwhSWh6vMDRXgzg0NAAOhJikrYME",
+            authDomain: "ff-tonament-5995a.firebaseapp.com",
+            databaseURL: "https://ff-tonament-5995a-default-rtdb.firebaseio.com",
+            projectId: "ff-tonament-5995a",
+            appId: "1:907573402759:web:fa0c9da017f3047b336c22"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // 🛡️ Login Check
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('loader').style.display = "none";
+                document.body.style.display = "block";
+                loadCoins();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        const dbURL = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/users/nitesh_kumar/coins.json";
+
+        function loadCoins() {
+            fetch(dbURL).then(res => res.json()).then(data => {
+                document.getElementById('userCoins').innerText = data || 0;
+            });
+        }
+
+        function joinMatch(fee) {
+            let coins = parseInt(document.getElementById('userCoins').innerText);
+            if(coins >= fee) {
+                fetch(dbURL, { method: 'PUT', body: JSON.stringify(coins - fee) })
+                .then(() => {
+                    alert("✅ Success! Aap match mein join ho gaye.");
+                    loadCoins();
+                });
+            } else {
+                alert("❌ Bhai coins kam hain! Recharge karo.");
+            }
+        }
+    </script>
+</body>
+</html>
