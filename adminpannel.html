@@ -1,70 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="hi">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>Admin - Control Room</title>
+    <title>Admin - All Controls</title>
     <style>
-        body { font-family: sans-serif; background: #05050a; color: white; padding: 20px; }
-        .card { background: #16213e; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-top: 4px solid #00f2ff; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0a0a12; color: white; font-size: 16px; }
-        button { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #00f2ff; color: black; margin-top: 10px; }
-        .wa-btn { background: #25D366; color: white; }
-        .room-btn { background: #ff0055; color: white; }
+        :root { --neon: #00f2ff; --bg: #05050a; --card: #16213e; --pink: #ff0055; --yellow: #ffcc00; }
+        body { font-family: sans-serif; background: var(--bg); color: white; padding: 15px; margin: 0; }
+        h2 { text-align: center; color: var(--neon); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 25px; }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border-top: 4px solid var(--neon); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        h3 { margin-top: 0; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0a0a12; color: white; font-size: 15px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 14px; margin-top: 5px; }
+        button:active { transform: scale(0.95); }
+        
+        .btn-blue { background: var(--neon); color: black; }
+        .btn-pink { background: var(--pink); color: white; }
+        .btn-yellow { background: var(--yellow); color: black; }
+        .btn-green { background: #25D366; color: white; }
     </style>
 </head>
 <body>
-    <h2>🚀 ADMIN CONTROL</h2>
+
+    <h2>🚀 TOURNAMENT ADMIN</h2>
 
     <div class="card">
-        <h3>⚔️ Bermuda Match Prize</h3>
-        <input type="number" id="fee" placeholder="Entry Fee">
-        <input type="text" id="win" placeholder="Prize Money (e.g. ₹100)">
-        <button onclick="updateBermuda()">UPDATE MATCH</button>
+        <h3>⚔️ BERMUDA MATCH PRIZE</h3>
+        <input type="number" id="fee" placeholder="Entry Fee (Coins)">
+        <input type="text" id="win" placeholder="Win Prize (e.g. ₹100)">
+        <button class="btn-blue" onclick="updateBermuda()">Update Match Data</button>
     </div>
 
-    <div class="card">
-        <h3>🔑 Room ID & Password</h3>
-        <input type="text" id="rid" placeholder="Room ID">
-        <input type="text" id="rpass" placeholder="Room Password">
-        <button class="room-btn" onclick="updateRoom()">SEND ID/PASS TO APP</button>
+    <div class="card" style="border-top-color: var(--pink);">
+        <h3>🔑 ROOM ID & PASSWORD</h3>
+        <input type="text" id="rid" placeholder="Enter Room ID">
+        <input type="text" id="rpass" placeholder="Enter Room Password">
+        <button class="btn-pink" onclick="updateRoom()">Send ID/Pass to App</button>
     </div>
 
-    <div class="card">
-        <h3>🔗 WhatsApp Link</h3>
+    <div class="card" style="border-top-color: var(--yellow);">
+        <h3>📜 TOURNAMENT RULES</h3>
+        <textarea id="rules_text" rows="4" placeholder="Enter rules here... (Press Enter for next line)"></textarea>
+        <button class="btn-yellow" onclick="updateRules()">Update Rules</button>
+    </div>
+
+    <div class="card" style="border-top-color: #25D366;">
+        <h3>🔗 WHATSAPP GROUP LINK</h3>
         <input type="text" id="wa" placeholder="https://chat.whatsapp.com/...">
-        <button class="wa-btn" onclick="updateWA()">SAVE WA LINK</button>
+        <button class="btn-green" onclick="updateWA()">Save WhatsApp Link</button>
     </div>
 
     <script>
-        // Database Link
         const db = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/";
 
+        // 1. Update Match
         function updateBermuda() {
             let f = document.getElementById('fee').value;
             let w = document.getElementById('win').value;
-            if(!f || !w) return alert("Khali mat chhodo!");
+            if(!f || !w) return alert("Pehle Fee aur Prize likho!");
             
-            let data = { entry: parseInt(f), win: w };
-            fetch(db + "matches/bermuda.json", { method: 'PUT', body: JSON.stringify(data) })
-            .then(() => alert("✅ Match Updated!"));
+            fetch(db + "matches/bermuda.json", { 
+                method: 'PUT', 
+                body: JSON.stringify({ entry: parseInt(f), win: w }) 
+            }).then(() => alert("✅ Match Updated!"));
         }
 
+        // 2. Update Room ID/Pass
         function updateRoom() {
             let i = document.getElementById('rid').value;
             let p = document.getElementById('rpass').value;
-            if(!i || !p) return alert("ID/Pass dalo!");
+            if(!i || !p) return alert("ID aur Password dono dalo!");
 
-            let data = { id: i, pass: p };
-            fetch(db + "room_details.json", { method: 'PUT', body: JSON.stringify(data) })
-            .then(() => alert("✅ ID/Pass Sent to App!"));
+            fetch(db + "room_details.json", { 
+                method: 'PUT', 
+                body: JSON.stringify({ id: i, pass: p }) 
+            }).then(() => alert("✅ ID/Pass Players ko bhej diya!"));
         }
 
+        // 3. Update Rules
+        function updateRules() {
+            let r = document.getElementById('rules_text').value;
+            if(!r) return alert("Rules toh likho bhai!");
+
+            fetch(db + "settings/rules.json", { 
+                method: 'PUT', 
+                body: JSON.stringify(r) 
+            }).then(() => alert("✅ Rules Updated!"));
+        }
+
+        // 4. Update WhatsApp
         function updateWA() {
             let link = document.getElementById('wa').value;
-            if(!link) return alert("Link dalo!");
+            if(!link) return alert("Link paste karo!");
 
-            fetch(db + "settings/whatsapp.json", { method: 'PUT', body: JSON.stringify(link) })
-            .then(() => alert("✅ WhatsApp Link Updated!"));
+            fetch(db + "settings/whatsapp.json", { 
+                method: 'PUT', 
+                body: JSON.stringify(link) 
+            }).then(() => alert("✅ WhatsApp Link Saved!"));
         }
     </script>
 </body>
