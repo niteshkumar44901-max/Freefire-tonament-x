@@ -8,31 +8,31 @@
         :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; --green: #25D366; }
         body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; }
         .header { text-align: center; padding: 10px; border-bottom: 2px solid var(--neon); margin-bottom: 20px; }
-        .card { background: var(--card); padding: 20px; border-radius: 15px; border-top: 4px solid var(--green); text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; border-top: 4px solid var(--green); text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); position: relative; }
         .prize-row { display: flex; justify-content: space-around; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin: 15px 0; }
-        .join-btn { width: 100%; padding: 12px; background: var(--green); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-bottom: 10px; text-transform: uppercase; }
+        .join-btn { width: 100%; padding: 15px; background: var(--green); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-bottom: 10px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
         .view-btn { width: 100%; padding: 10px; background: transparent; color: var(--neon); border: 1px solid var(--neon); border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #idModal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#16213e; padding:25px; border-radius:15px; border:2px solid var(--neon); width:80%; z-index:100; text-align:center; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
+        #idModal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#16213e; padding:25px; border-radius:15px; border:2px solid var(--neon); width:85%; z-index:100; text-align:center; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
         #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:90; }
-        .badge { background: var(--green); color: white; padding: 2px 8px; border-radius: 5px; font-size: 12px; vertical-align: middle; }
+        .badge { background: var(--green); color: white; padding: 2px 8px; border-radius: 5px; font-size: 12px; vertical-align: middle; margin-left: 5px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="margin:0; letter-spacing:1px;">🏆 FF TOURNAMENT</h2>
+        <h2 style="margin:0; letter-spacing:1px; color: var(--neon);">🏆 FF TOURNAMENT</h2>
     </div>
 
     <div class="card">
         <h3 style="margin:0;">⚔️ TEST MATCH <span class="badge">LIVE</span></h3>
-        <p style="color:#aaa; font-size:12px; margin:5px 0;">Map: <span id="mapName">Bermuda</span></p>
+        <p style="color:#aaa; font-size:13px; margin:8px 0;">🗺️ Map: <span id="mapName" style="color:white; font-weight:bold;">Bermuda</span></p>
         
         <div class="prize-row">
-            <div><p style="margin:0; color:#aaa; font-size:11px;">Entry</p><b style="color:var(--green);">FREE</b></div>
+            <div><p style="margin:0; color:#aaa; font-size:11px;">Entry</p><b style="color:var(--green); font-size:18px;">FREE</b></div>
             <div style="border-left:1px solid #444; border-right:1px solid #444; padding:0 15px;">
-                <p style="margin:0; color:#aaa; font-size:11px;">Kills</p><b>₹0</b>
+                <p style="margin:0; color:#aaa; font-size:11px;">Kills</p><b style="font-size:18px;">₹0</b>
             </div>
-            <div><p style="margin:0; color:#aaa; font-size:11px;">Booyah</p><b style="color:var(--neon);" id="winPrize">₹10</b></div>
+            <div><p style="margin:0; color:#aaa; font-size:11px;">Booyah</p><b style="color:var(--neon); font-size:18px;" id="winPrize">₹10</b></div>
         </div>
 
         <button class="join-btn" onclick="join()">JOIN NOW (FREE)</button>
@@ -40,39 +40,57 @@
     </div>
 
     <div id="overlay" onclick="hide()"></div>
+
     <div id="idModal">
         <h3 style="color:var(--neon); margin-top:0;">🎮 ROOM DETAILS</h3>
-        <div style="background:#0a0a12; padding:15px; border-radius:10px; margin-bottom:15px;">
-            <p style="margin:5px 0;">ID: <span id="rid" style="font-weight:bold; font-size:20px; color:white;">---</span></p>
-            <p style="margin:5px 0;">PASS: <span id="rpass" style="font-weight:bold; font-size:20px; color:white;">---</span></p>
+        <div style="background:#0a0a12; padding:15px; border-radius:10px; margin-bottom:15px; border: 1px dashed #444;">
+            <p style="margin:5px 0; color:#aaa;">Room ID:</p>
+            <span id="rid" style="font-weight:bold; font-size:24px; color:white;">---</span>
+            <p style="margin:15px 0 5px 0; color:#aaa;">Password:</p>
+            <span id="rpass" style="font-weight:bold; font-size:24px; color:white;">---</span>
         </div>
-        <button onclick="hide()" style="width:100%; background:#ff0055; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold;">CLOSE</button>
+        <button onclick="hide()" style="width:100%; background:#ff0055; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">CLOSE</button>
     </div>
 
     <script>
-        const db = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/match_data.json";
+        // Firebase link (Check kar lena sahi hai na)
+        const dbURL = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/match_data.json";
 
+        // Apna WhatsApp Group Link yahan dalo
+        const myWhatsApp = "https://chat.whatsapp.com/CanP81lzBVo6gQkpe0suHx";
+
+        // Database se data load karne ke liye
         function loadData() {
-            fetch(db).then(res => res.json()).then(data => {
+            fetch(dbURL)
+            .then(res => res.json())
+            .then(data => {
                 if(data) {
-                    document.getElementById('winPrize').innerText = "₹" + data.win;
-                    document.getElementById('rid').innerText = data.id;
-                    document.getElementById('rpass').innerText = data.pass;
+                    document.getElementById('winPrize').innerText = "₹" + (data.win || "10");
+                    document.getElementById('rid').innerText = data.id || "WAIT";
+                    document.getElementById('rpass').innerText = data.pass || "WAIT";
                     if(data.map) document.getElementById('mapName').innerText = data.map;
                 }
-            });
+            })
+            .catch(err => console.log("Data error:", err));
         }
-        setInterval(loadData, 3000); // Har 3 sec me update check karega
 
+        // Har 3 second mein refresh karega
+        setInterval(loadData, 3000);
+        loadData();
+
+        // Join button dabane par WhatsApp khulega
         function join() {
-            alert("✅ Successfully Joined! Room ID/Pass match se 10 min pehle yahi milega.");
+            alert("✅ Successfully Joined! Ab humare WhatsApp group mein join ho jaiye.");
+            window.location.href = myWhatsApp;
         }
 
+        // Modal dikhane ke liye
         function show() {
             document.getElementById('idModal').style.display = "block";
             document.getElementById('overlay').style.display = "block";
         }
 
+        // Modal chhupane ke liye
         function hide() {
             document.getElementById('idModal').style.display = "none";
             document.getElementById('overlay').style.display = "none";
