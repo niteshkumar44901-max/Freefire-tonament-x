@@ -4,99 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>FF Tournament Pro</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <style>
         :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; --green: #25D366; --red: #ff4d4d; }
         body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; }
-        #login-section { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--neon); text-align: center; margin-top: 20px; }
+        #login-section { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--neon); text-align: center; margin-top: 30px; }
         #app-section { display: none; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; background: #05050a; color: white; box-sizing: border-box; border-bottom: 2px solid var(--neon); }
-        .google-btn { width: 100%; padding: 12px; background: white; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
-        .google-btn img { width: 20px; margin-right: 10px; }
-        .or-text { margin: 10px 0; color: #aaa; font-size: 12px; }
-        .rules-box { background: rgba(0,0,0,0.5); border: 1px solid #444; padding: 10px; border-radius: 10px; text-align: left; font-size: 11px; margin: 15px 0; color: #ccc; }
-        .user-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #333; }
-        .card { background: var(--card); padding: 20px; border-radius: 15px; border-top: 4px solid var(--green); text-align: center; }
-        .join-btn { width: 100%; padding: 15px; background: var(--green); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #05050a; color: white; box-sizing: border-box; border-bottom: 2px solid var(--neon); font-size: 16px; }
+        .rules { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px; font-size: 11px; text-align: left; color: #ccc; margin: 15px 0; border: 1px solid #444; }
+        .join-btn { width: 100%; padding: 16px; background: var(--green); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); }
+        .user-bar { display: flex; justify-content: space-between; padding: 10px; background: #16213e; border-radius: 10px; margin-bottom: 20px; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
     <div id="login-section">
-        <h2 style="color:var(--neon); margin-bottom:15px;">🎮 PLAYER LOGIN</h2>
-
-        <button class="google-btn" onclick="googleLogin()">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg">
-            Login with Google
-        </button>
-
-        <div class="or-text">OR REGISTER MANUALLY</div>
-        
-        <input type="text" id="playerName" placeholder="FF Name (e.g. SKY-LORD)">
-        <input type="number" id="playerUID" placeholder="FF UID (Digits Only)">
+        <h2 style="color:var(--neon);">🎮 PLAYER LOGIN</h2>
+        <input type="text" id="playerName" placeholder="Free Fire Name">
+        <input type="number" id="playerUID" placeholder="Free Fire UID">
         <input type="number" id="playerWhatsApp" placeholder="WhatsApp Number">
-
-        <div class="rules-box">
-            <b>⚠️ RULES:</b> No Hack | No Team-up | UID must be Correct.
+        
+        <div class="rules">
+            <b style="color:var(--red);">RULES:</b> No Hacks | No Team-up | UID must be correct for Prize Payment.
         </div>
-
-        <button onclick="doLogin()" style="width:100%; padding:15px; background:var(--neon); border:none; border-radius:8px; font-weight:bold; color:black;">PROCEED</button>
+        
+        <button onclick="doLogin()" style="width:100%; padding:15px; background:var(--neon); color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">AGREE & PROCEED</button>
     </div>
 
     <div id="app-section">
         <div class="user-bar">
-            <span>Hi, <b id="welcomeUser" style="color:var(--neon);"></b>!</span>
-            <button onclick="doLogout()" style="background:var(--red); color:white; border:none; padding:5px 10px; border-radius:5px; font-size:10px;">LOGOUT</button>
+            <span>Hi, <b id="welcomeUser" style="color:var(--neon);"></b></span>
+            <button onclick="localStorage.clear(); location.reload();" style="background:var(--red); color:white; border:none; padding:5px 10px; border-radius:5px; font-size:11px;">LOGOUT</button>
         </div>
 
-        <div class="card">
-            <h3>⚔️ DAILY BATTLE</h3>
-            <p id="displayMap">Map: Bermuda Solo</p>
-            <div style="display:flex; justify-content:space-around; margin:15px 0; background:rgba(0,0,0,0.3); padding:10px; border-radius:10px;">
-                <div><small>Entry</small><br><b style="color:var(--green);">FREE</b></div>
-                <div><small>Booyah</small><br><b style="color:var(--neon);" id="winPrize">₹10</b></div>
-            </div>
-            <button class="join-btn" onclick="window.location.href='https://chat.whatsapp.com/CanP81lzBVo6gQkpe0suHx?mode=gi_t'">JOIN WHATSAPP GROUP</button>
+        <div style="background:var(--card); padding:20px; border-radius:15px; text-align:center; border-top:4px solid var(--green);">
+            <h3 style="margin:0;">⚔️ FREE TEST MATCH</h3>
+            <p style="color:#aaa; font-size:13px;">Map: Bermuda Solo</p>
+            <h2 style="color:var(--neon);">Booyah: ₹10</h2>
+            
+            <button class="join-btn" onclick="goToWhatsApp()">JOIN WHATSAPP GROUP</button>
         </div>
     </div>
 
     <script>
-        // FIREBASE CONFIG (Isse apne Firebase settings se replace karein)
-        const firebaseConfig = {
-            apiKey: "AIzaSy...", 
-            authDomain: "ff-tonament-5995a.firebaseapp.com",
-            databaseURL: "https://ff-tonament-5995a-default-rtdb.firebaseio.com",
-            projectId: "ff-tonament-5995a",
-            storageBucket: "ff-tonament-5995a.appspot.com",
-            messagingSenderId: "...",
-            appId: "..."
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const provider = new firebase.auth.GoogleAuthProvider();
+        // FIREBASE LINK
+        const dbURL = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/";
+        // SAHI WHATSAPP LINK (Extra kachra hata diya)
+        const myGroup = "https://chat.whatsapp.com/CanP81lzBVo6gQkpe0suHx";
 
         window.onload = function() {
             const user = localStorage.getItem('ff_user');
             if(user) { showApp(user); }
         };
-
-        // GOOGLE LOGIN FUNCTION
-        function googleLogin() {
-            auth.signInWithPopup(provider).then((result) => {
-                const user = result.user;
-                localStorage.setItem('ff_user', user.displayName);
-                showApp(user.displayName);
-                // Database mein Gmail save karna
-                firebase.database().ref('players/' + user.uid).update({
-                    name: user.displayName,
-                    email: user.email,
-                    lastLogin: new Date().toLocaleString()
-                });
-            }).catch((error) => {
-                alert("Google Login Failed: " + error.message);
-            });
-        }
 
         function doLogin() {
             const name = document.getElementById('playerName').value.trim();
@@ -105,28 +63,26 @@
 
             if(name && uid.length >= 8 && phone.length >= 10) {
                 localStorage.setItem('ff_user', name);
-                fetch(firebaseConfig.databaseURL + "/players/" + name + ".json", { 
+                // Firebase mein data save karna
+                fetch(dbURL + "players/" + name + ".json", { 
                     method: 'PUT', 
                     body: JSON.stringify({name, uid, phone}) 
                 });
                 showApp(name);
-            } else { alert("Sahi details dalo!"); }
+            } else {
+                alert("Bhai, Details sahi se dalo! UID aur Phone sahi hona chahiye.");
+            }
         }
 
         function showApp(name) {
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('app-section').style.display = 'block';
             document.getElementById('welcomeUser').innerText = name;
-            // Match data load
-            fetch(firebaseConfig.databaseURL + "/match_data.json").then(r => r.json()).then(data => {
-                if(data) document.getElementById('winPrize').innerText = "₹" + (data.win || "10");
-            });
         }
 
-        function doLogout() {
-            auth.signOut();
-            localStorage.clear();
-            location.reload();
+        function goToWhatsApp() {
+            // Nayi window mein kholne ke liye
+            window.open(myGroup, "_blank");
         }
     </script>
 </body>
