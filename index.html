@@ -6,46 +6,43 @@
     <title>FF Tournament Official</title>
     <style>
         :root { --neon: #00f2ff; --bg: #0a0a12; --card: #16213e; --green: #25D366; --red: #ff4d4d; --gold: #ffd700; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; }
+        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; }
         
-        /* Registration Box */
-        #login-section { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--neon); text-align: center; margin-top: 20px; box-shadow: 0 0 20px rgba(0,242,255,0.1); }
+        /* Registration Section */
+        #login-section { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--neon); text-align: center; margin-top: 20px; }
         input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: none; background: #05050a; color: white; box-sizing: border-box; border-bottom: 2px solid var(--neon); font-size: 16px; }
         
-        /* Rules Section - Professional Look */
-        .rules-container { background: rgba(0,0,0,0.6); border: 1px solid #333; padding: 15px; border-radius: 12px; text-align: left; font-size: 13px; margin: 20px 0; line-height: 1.6; }
-        .rules-container h4 { color: var(--gold); margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px; }
-        .rule-item { margin-bottom: 8px; display: flex; align-items: flex-start; }
-        .rule-icon { margin-right: 8px; }
+        /* Rules Container */
+        .rules-container { background: rgba(0,0,0,0.6); border: 1px solid #333; padding: 15px; border-radius: 12px; text-align: left; font-size: 13px; margin: 20px 0; line-height: 1.5; }
+        .rules-container h4 { color: var(--gold); margin: 0 0 10px 0; border-bottom: 1px solid #444; }
 
         /* App Section */
         #app-section { display: none; }
-        .user-bar { display: flex; justify-content: space-between; align-items: center; background: #16213e; padding: 12px 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; }
+        .user-bar { display: flex; justify-content: space-between; align-items: center; background: #16213e; padding: 12px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; }
         .card { background: var(--card); padding: 25px; border-radius: 20px; border-top: 5px solid var(--green); text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
-        .join-btn { width: 100%; padding: 18px; background: var(--green); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
+        .join-btn { width: 100%; padding: 18px; background: var(--green); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 18px; text-transform: uppercase; }
         .view-btn { width: 100%; padding: 12px; background: transparent; color: var(--neon); border: 1px solid var(--neon); border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <div id="login-section">
-        <h2 style="color:var(--neon); margin-bottom:5px;">TOURNAMENT REGISTRATION</h2>
-        <p style="font-size:12px; color:#aaa;">Sahi details bharein, prize verify kiya jayega</p>
+        <h2 style="color:var(--neon); margin-bottom:5px;">TOURNAMENT LOGIN</h2>
+        <p style="font-size:12px; color:#aaa;">Register karke match join karein</p>
         
-        <input type="text" id="playerName" placeholder="Free Fire Name (Exact)">
-        <input type="number" id="playerUID" placeholder="Free Fire UID (8-12 Digits)">
+        <input type="text" id="playerName" placeholder="Free Fire Name">
+        <input type="number" id="playerUID" placeholder="Free Fire UID">
         <input type="number" id="playerWhatsApp" placeholder="WhatsApp Number">
 
         <div class="rules-container">
-            <h4>🏆 TOURNAMENT OFFICIAL RULES</h4>
-            <div class="rule-item"><span class="rule-icon">🚫</span><span><b>No Hacking:</b> Auto-aim ya hack use kiya toh turant ban aur koi prize nahi.</span></div>
-            <div class="rule-item"><span class="rule-icon">🚷</span><span><b>No Team-up:</b> Do alag team ke bande saath khele toh dono disqualify.</span></div>
-            <div class="rule-item"><span class="rule-icon">📱</span><span><b>Mobile Only:</b> Emulator players kick kar diye jayenge.</span></div>
-            <div class="rule-item"><span class="rule-icon">⏰</span><span><b>Be On Time:</b> Match start ke baad entry nahi milegi.</span></div>
-            <div class="rule-item" style="color: var(--gold);"><span class="rule-icon">📸</span><span><b>Screenshot:</b> Jeetne ke baad Booyah ka screenshot group mein bhejna zaroori hai.</span></div>
+            <h4>🏆 OFFICIAL RULES</h4>
+            • 🚫 No Hack/Cheat (Ban)<br>
+            • 🚷 No Team-up Allowed<br>
+            • 📱 Mobile Only Players<br>
+            • 📸 Win Screenshot is Mandatory
         </div>
 
-        <button onclick="doLogin()" style="width:100%; padding:16px; background:var(--neon); color:black; border:none; border-radius:10px; font-weight:bold; font-size:16px; cursor:pointer;">AGREE & START</button>
+        <button onclick="doLogin()" style="width:100%; padding:16px; background:var(--neon); color:black; border:none; border-radius:10px; font-weight:bold; font-size:16px;">AGREE & START</button>
     </div>
 
     <div id="app-section">
@@ -55,24 +52,24 @@
         </div>
 
         <div class="card">
-            <div style="background:rgba(37, 211, 102, 0.1); color:var(--green); display:inline-block; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; margin-bottom:10px;">MATCH LIVE</div>
             <h3 style="margin:0; font-size:22px;">⚔️ DAILY PRACTICE BATTLE</h3>
-            <p style="color:#aaa; font-size:14px; margin:10px 0;">Map: Bermuda Solo | Classic</p>
+            <p style="color:#aaa; font-size:14px; margin:10px 0;">Bermuda Solo | Entry: FREE</p>
             
             <div style="display:flex; justify-content:space-around; background:rgba(0,0,0,0.3); padding:15px; border-radius:15px; margin:20px 0;">
-                <div><small style="color:#aaa;">Entry</small><br><b style="color:var(--green); font-size:20px;">FREE</b></div>
-                <div style="border-left:1px solid #444; border-right:1px solid #444; padding:0 20px;"><small style="color:#aaa;">Kills</small><br><b>₹0</b></div>
-                <div><small style="color:#aaa;">Booyah</small><br><b style="color:var(--neon); font-size:20px;" id="winPrize">₹10</b></div>
+                <div><small>Prize Pool</small><br><b style="color:var(--gold); font-size:20px;">₹10</b></div>
+                <div style="border-left:1px solid #444; border-right:1px solid #444; padding:0 20px;"><small>Type</small><br><b>SOLO</b></div>
+                <div><small>Booyah</small><br><b style="color:var(--neon); font-size:20px;">₹10</b></div>
             </div>
 
             <button class="join-btn" onclick="joinWhatsApp()">JOIN WHATSAPP GROUP</button>
-            <button class="view-btn" onclick="alert('Room ID/Pass: Match se 10 min pehle yahan update hoga. Group par nazar rakhein!')">VIEW ROOM ID/PASS</button>
+            <button class="view-btn" onclick="alert('Room ID/Pass: Group join karein, wahan update aayega!')">VIEW ROOM ID/PASS</button>
         </div>
     </div>
 
     <script>
         const dbURL = "https://ff-tonament-5995a-default-rtdb.firebaseio.com/";
-        const whatsappLink = "https://chat.whatsapp.com/CanP81lzBVo6gQkpe0suHx?mode=gi_t";
+        // NAYA RESET LINK UPDATE KAR DIYA HAI
+        const whatsappLink = "https://chat.whatsapp.com/IOwj4Tk6Mq5JNwqyRuI0IL?mode=gi_t";
 
         window.onload = function() {
             const user = localStorage.getItem('ff_user');
@@ -92,7 +89,7 @@
                 });
                 showApp(name);
             } else {
-                alert("Bhai, sari details sahi se dalo tabhi aage badh paoge!");
+                alert("Bhai, sari details sahi se dalo!");
             }
         }
 
@@ -100,13 +97,6 @@
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('app-section').style.display = 'block';
             document.getElementById('welcomeUser').innerText = name;
-            loadMatchData();
-        }
-
-        function loadMatchData() {
-            fetch(dbURL + "match_data.json").then(r => r.json()).then(data => {
-                if(data) document.getElementById('winPrize').innerText = "₹" + (data.win || "10");
-            });
         }
 
         function joinWhatsApp() {
@@ -114,10 +104,8 @@
         }
 
         function logout() {
-            if(confirm("Logout karna chahte ho?")) {
-                localStorage.clear();
-                location.reload();
-            }
+            localStorage.clear();
+            location.reload();
         }
     </script>
 </body>
